@@ -1,10 +1,5 @@
 #!/bin/sh
 
-render_image() {
-    chafa --format=symbols --colors=full --size="${width}x${height}" \
-        --animate=off --probe=off --polite=on "$1"
-}
-
 preview_text() {
     if command -v bat >/dev/null 2>&1; then
         highlighter=bat
@@ -20,8 +15,12 @@ preview_text() {
 }
 
 path=$1
-width=$2
 height=$3
+
+mime_type=$(file -bL --mime-type -- "$path" 2>/dev/null) || mime_type=
+case "$mime_type" in
+    image/*) exit 0 ;;
+esac
 
 size=$(stat -Lc %s -- "$path" 2>/dev/null) || size=0
 if [ "$size" -gt 1048576 ]; then
@@ -29,31 +28,13 @@ if [ "$size" -gt 1048576 ]; then
     exit $?
 fi
 
-if command -v file >/dev/null 2>&1; then
-    case $(file -bL --mime-type -- "$path" 2>/dev/null) in
-        image/*)
-            if command -v chafa >/dev/null 2>&1; then
-                render_image "$path" 2>/dev/null && exit 0
-                printf '%s\n' 'Could not preview this image.'
-            else
-                printf '%s\n' 'Image previews require Chafa.'
-            fi
-            exit 0
-            ;;
-        application/pdf)
-            if command -v chafa >/dev/null 2>&1 &&
-               command -v pdftoppm >/dev/null 2>&1; then
-                pdftoppm -f 1 -l 1 -singlefile -scale-to 800 -png -- "$path" 2>/dev/null |
-                    render_image - 2>/dev/null && exit 0
-            fi
-            if command -v pdftotext >/dev/null 2>&1; then
-                pdftotext -f 1 -l 1 -nopgbrk -- "$path" - 2>/dev/null | head -n "$height"
-            else
-                printf '%s\n' 'PDF previews require Poppler.'
-            fi
-            exit 0
-            ;;
-    esac
+if [ "$mime_type" = application/pdf ]; then
+    if command -v pdftotext >/dev/null 2>&1; then
+        pdftotext -f 1 -l 1 -nopgbrk -- "$path" - 2>/dev/null | head -n "$height"
+    else
+        printf '%s\n' 'PDF previews require Poppler.'
+    fi
+    exit 0
 fi
 
 preview_text "$path"

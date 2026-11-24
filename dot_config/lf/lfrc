@@ -17,3 +17,17 @@ cmd fzf_select ${{
     fi
     lf -remote "send $id $cmd \"$res\""
 }}
+
+cmd preview-full ${{
+    if command -v bat >/dev/null 2>&1; then
+        highlighter=bat
+    elif command -v batcat >/dev/null 2>&1; then
+        highlighter=batcat
+    else
+        exec $PAGER "$f"
+    fi
+
+    exec "$highlighter" --color=always --theme=ansi --style=plain --paging=always --pager='less -R' -- "$f"
+}}
+
+map i preview-full
