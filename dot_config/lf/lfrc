@@ -27,7 +27,7 @@ cmd preview-full ${{
         exec $PAGER "$f"
     fi
 
-    exec "$highlighter" --color=always --theme=ansi --style=plain --paging=always --pager='less -R' -- "$f"
+    exec "$highlighter" --color=always --theme=ansi --style=plain --paging=always --pager='less -R -c -~' -- "$f"
 }}
 
 map i preview-full
