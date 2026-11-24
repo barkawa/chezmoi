@@ -1,0 +1,5 @@
+[user]
+	email = konrad.buchmann@icloud.com
+	name = Konrad Buchmann
+[init]
+	defaultBranch = main
