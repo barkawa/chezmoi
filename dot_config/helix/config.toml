@@ -1,0 +1,12 @@
+theme = "monokai_pro"
+
+[editor]
+line-number = "relative"
+mouse = false
+soft-wrap.enable = true
+bufferline = "multiple"
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
